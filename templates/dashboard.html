@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Área do Aluno{% endblock %}
+
+{% block conteudo %}
+<h1>Área do Aluno</h1>
+
+<p>Bem-vinda, <strong>{{ session['usuario_nome'] }}</strong>! 💗</p>
+
+<div class="card">
+    <h2>Seu Progresso</h2>
+    <p>Aqui você pode acompanhar suas atividades cadastradas e organizar seus estudos.</p>
+
+    <ul>
+        <li>Total de atividades cadastradas: <strong>{{ total_atividades }}</strong></li>
+        <li>Atividades para entregar hoje: <strong>{{ atividades_hoje }}</strong></li>
+    </ul>
+</div>
+
+<p>Acesse suas <a href="{{ url_for('atividades.listar') }}">Atividades</a> para continuar estudando </p>
+{% endblock %}

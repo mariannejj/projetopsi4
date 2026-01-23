@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block titulo %}Página Inicial{% endblock %}
+
+{% block conteudo %}
+    <h1>Plataforma de Organização de Estudos</h1>
+    <p>Esta plataforma foi desenvolvida para ajudar alunos do Ensino Fundamental e Médio a organizarem suas atividades escolares, datas de provas e conteúdos de estudo de forma fácil.</p>
+    
+    <h2>Funcionalidades Disponíveis:</h2>
+    <ul>
+        <li>Listagem de Atividades</li>
+        <li>Cadastro de novas Atividades</li>
+        <li>Remoção de Atividades</li>
+    </ul>
+    
+    <p>Acesse o <a href="{{ url_for('atividades.listar') }}">link das Atividades</a> para começar a usar.</p>
+{% endblock %}
