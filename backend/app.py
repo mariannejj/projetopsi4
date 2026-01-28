@@ -8,7 +8,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # evita avisos
     app.config['SECRET_KEY'] = 'uma_chave_secreta_aqui'  # sessões
 
-    db.init_app(app)  # inicia DB
+    db.init_app(app)  #  DB
 
     from controllers.main import main_bp
     from controllers.atividades import atividades_bp
