@@ -1,93 +1,112 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from models import db, Atividade
-from datetime import datetime
-from controllers.usuarios import login_obrigatorio
+from flask import request, jsonify
+from settings import tipos_permitidos, status_permitidos
+from db import get_db
 
-# blueprint das rotas de atividades
-atividades_bp = Blueprint('atividades', __name__)
+def validar(dados, parcial=False):
+    if not parcial:
+        if "titulo" not in dados or len(dados["titulo"].strip()) < 3:
+            return "titulo invalido"
+        if dados.get("tipo") not in tipos_permitidos:
+            return "tipo invalido"
+        if dados.get("status") not in status_permitidos:
+            return "status invalido"
 
-@atividades_bp.route('/', methods=['GET'])
-@login_obrigatorio
+    if "valor" in dados and dados["valor"] is not None:
+        try:
+            if float(dados["valor"]) < 0:
+                return "valor invalido"
+        except:
+            return "valor invalido"
+
+    return None
+
 def listar():
-    # lista atividades ordenadas pela data de criação
-    atividades = Atividade.query.order_by(Atividade.data_criacao.desc()).all()
-    return render_template('atividades/lista.html', atividades=atividades)
+    tipo = request.args.get("tipo")
+    status = request.args.get("status")
 
-@atividades_bp.route('/novo', methods=['GET', 'POST'])
-@login_obrigatorio
-def novo():
-    if request.method == 'POST':
-        # coleta dados do formulário
-        titulo = request.form.get('titulo')
-        descricao = request.form.get('descricao')
-        data_entrega_str = request.form.get('data_entrega')
-        disciplina = request.form.get('disciplina')
-        tipo = request.form.get('tipo')   
+    sql = "select * from items"
+    params = []
 
-        # valida campos obrigatórios
-        if not titulo or not data_entrega_str:
-            flash('Título e Data de entrega são obrigatórios!', 'danger')
-            return redirect(url_for('atividades.novo'))
+    if tipo and status:
+        sql += " where tipo = ? and status = ?"
+        params = [tipo, status]
+    elif tipo:
+        sql += " where tipo = ?"
+        params = [tipo]
+    elif status:
+        sql += " where status = ?"
+        params = [status]
 
-        # valida formato de data
-        try:
-            data_entrega = datetime.strptime(data_entrega_str, '%Y-%m-%d').date()
-        except ValueError:
-            flash('Formato de data inválido!', 'danger')
-            return redirect(url_for('atividades.novo'))
-        
-        # cria nova atividade
-        nova_atividade = Atividade(
-            titulo=titulo,
-            descricao=descricao,
-            data_entrega=data_entrega,
-            disciplina=disciplina,
-            tipo=tipo  
-        )
-        
-        db.session.add(nova_atividade)
-        db.session.commit()
-        
-        flash('Atividade cadastrada com sucesso!', 'success')
-        return redirect(url_for('atividades.listar'))
-    
-    return render_template('atividades/form.html')
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(sql, params)
+    dados = cur.fetchall()
+    conn.close()
 
-@atividades_bp.route('/deletar/<int:id>', methods=['POST'])
-@login_obrigatorio
-def deletar(id):
-    # busca atividade pelo id
-    atividade = Atividade.query.get_or_404(id)
-    
-    db.session.delete(atividade)
-    db.session.commit()
+    return jsonify([dict(d) for d in dados])
 
-    flash('Atividade removida com sucesso!', 'warning')
-    return redirect(url_for('atividades.listar'))
+def criar():
+    dados = request.get_json()
+    erro = validar(dados)
+    if erro:
+        return jsonify({"error": erro}), 400
 
-@atividades_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
-@login_obrigatorio
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        insert into items (titulo, tipo, status, data, valor)
+        values (?, ?, ?, ?, ?)
+    """, (
+        dados["titulo"],
+        dados["tipo"],
+        dados["status"],
+        dados.get("data"),
+        dados.get("valor")
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True}), 201
+
 def editar(id):
-    # busca atividade pelo id
-    atividade = Atividade.query.get_or_404(id)
+    dados = request.get_json()
+    erro = validar(dados)
+    if erro:
+        return jsonify({"error": erro}), 400
 
-    if request.method == 'POST':
-        # atualiza campos
-        atividade.titulo = request.form.get('titulo')
-        atividade.descricao = request.form.get('descricao')
-        data_entrega_str = request.form.get('data_entrega')
-        atividade.disciplina = request.form.get('disciplina')
-        atividade.tipo = request.form.get('tipo')   
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        update items
+        set titulo = ?, tipo = ?, status = ?, data = ?, valor = ?
+        where id = ?
+    """, (
+        dados["titulo"],
+        dados["tipo"],
+        dados["status"],
+        dados.get("data"),
+        dados.get("valor"),
+        id
+    ))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
 
-        # valida data
-        try:
-            atividade.data_entrega = datetime.strptime(data_entrega_str, '%Y-%m-%d').date()
-        except ValueError:
-            flash('Formato de data inválido!', 'danger')
-            return redirect(url_for('atividades.editar', id=id))
+def mudar_status(id):
+    dados = request.get_json()
+    if dados.get("status") not in status_permitidos:
+        return jsonify({"error": "status invalido"}), 400
 
-        db.session.commit()
-        flash('Atividade atualizada com sucesso!', 'success')
-        return redirect(url_for('atividades.listar'))
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("update items set status = ? where id = ?", (dados["status"], id))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
 
-    return render_template('atividades/form.html', atividade=atividade)
+def remover(id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("delete from items where id = ?", (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})

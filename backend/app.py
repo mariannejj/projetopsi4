@@ -1,28 +1,20 @@
 from flask import Flask
-from models import db
+from flask_cors import CORS
+from db import init_db
+import items
 
-def create_app():
-    app = Flask(__name__)
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///plataforma_estudos.db'  # banco
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # evita avisos
-    app.config['SECRET_KEY'] = 'uma_chave_secreta_aqui'  # sessões
+app = Flask(__name__, instance_relative_config=True)
+app.config["database"] = "plataforma_estudos.db"
 
-    db.init_app(app)  #  DB
+CORS(app)
 
-    from controllers.main import main_bp
-    from controllers.atividades import atividades_bp
-    from controllers.usuarios import usuarios_bp
+with app.app_context():
+    init_db()
 
-    app.register_blueprint(main_bp)  # rotas
-    app.register_blueprint(atividades_bp, url_prefix='/atividades')
-    app.register_blueprint(usuarios_bp, url_prefix="/usuarios")
+app.route("/items", methods=["GET"])(items.listar)
+app.route("/items", methods=["POST"])(items.criar)
+app.route("/items/<int:id>", methods=["PUT"])(items.editar)
+app.route("/items/<int:id>/status", methods=["PATCH"])(items.mudar_status)
+app.route("/items/<int:id>", methods=["DELETE"])(items.remover)
 
-    with app.app_context():
-        db.create_all()  # cria tabelas
-
-    return app
-
-if __name__ == '__main__':
-    app = create_app()  # inicia app
-    app.run(debug=True)
+app.run(debug=True)
