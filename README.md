@@ -37,7 +37,9 @@ Frontend: Instalar dependências com npm e executar o projeto com npm run dev
 
 Autores
 Evelyn Ester Azevedo Brito
-Lívia Vitória Guadalupe Souza Faria
-Marianne Júlia Ferreira dos Santos
-Ludimila Érica Silva de Araújo
 Kessya Cauanny Araújo Costa
+Lívia Vitória Guadalupe Souza Faria
+Ludimila Érica Silva de Araújo
+Marianne Júlia Ferreira dos Santos
+
+
