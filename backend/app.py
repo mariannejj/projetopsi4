@@ -1,9 +1,11 @@
 from pathlib import Path
 from flask import Flask, send_from_directory
 from flask_cors import CORS
-
 from db import init_db
 import items
+
+app = Flask(__name__)
+CORS(app)
 
 
 def create_app() -> Flask:

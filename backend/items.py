@@ -1,8 +1,13 @@
 from flask import request, jsonify
 from settings import tipos_permitidos, status_permitidos
 from db import get_db
+from datetime import datetime
+
 
 def validar(dados, parcial=False):
+
+    if not dados:
+        return "dados invalidos"
     if not parcial:
         if "titulo" not in dados or len(dados["titulo"].strip()) < 3:
             return "titulo invalido"
@@ -10,15 +15,32 @@ def validar(dados, parcial=False):
             return "tipo invalido"
         if dados.get("status") not in status_permitidos:
             return "status invalido"
-
     if "valor" in dados and dados["valor"] is not None:
         try:
             if float(dados["valor"]) < 0:
                 return "valor invalido"
         except:
             return "valor invalido"
+    if "data" in dados and dados["data"] not in (None, ""):
+        try:
+            datetime.strptime(dados["data"], "%Y-%m-%d")
+        except:
+            return "data invalida"
 
     return None
+
+
+
+def buscar_item_por_id(id):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("select * from items where id = ?", (id,))
+    item = cur.fetchone()
+    conn.close()
+    if item:
+        return dict(item)
+    return None
+
 
 def listar():
     tipo = request.args.get("tipo")
@@ -45,6 +67,7 @@ def listar():
 
     return jsonify([dict(d) for d in dados])
 
+
 def criar():
     dados = request.get_json()
     erro = validar(dados)
@@ -64,10 +87,19 @@ def criar():
         dados.get("valor")
     ))
     conn.commit()
+
+    novo_id = cur.lastrowid  # pega o id do item criado
     conn.close()
-    return jsonify({"ok": True}), 201
+
+    item = buscar_item_por_id(novo_id)
+    return jsonify(item), 201
+
 
 def editar(id):
+    # 404 se não existir
+    if not buscar_item_por_id(id):
+        return jsonify({"error": "item nao encontrado"}), 404
+
     dados = request.get_json()
     erro = validar(dados)
     if erro:
@@ -89,9 +121,16 @@ def editar(id):
     ))
     conn.commit()
     conn.close()
-    return jsonify({"ok": True})
+
+    item = buscar_item_por_id(id)
+    return jsonify(item)
+
 
 def mudar_status(id):
+    # 404 se não existir
+    if not buscar_item_por_id(id):
+        return jsonify({"error": "item nao encontrado"}), 404
+
     dados = request.get_json()
     if dados.get("status") not in status_permitidos:
         return jsonify({"error": "status invalido"}), 400
@@ -101,12 +140,21 @@ def mudar_status(id):
     cur.execute("update items set status = ? where id = ?", (dados["status"], id))
     conn.commit()
     conn.close()
-    return jsonify({"ok": True})
+
+    item = buscar_item_por_id(id)
+    return jsonify(item)
+
 
 def remover(id):
+    # pega o item antes (pra poder retornar ele)
+    item = buscar_item_por_id(id)
+    if not item:
+        return jsonify({"error": "item nao encontrado"}), 404
+
     conn = get_db()
     cur = conn.cursor()
     cur.execute("delete from items where id = ?", (id,))
     conn.commit()
     conn.close()
-    return jsonify({"ok": True})
+
+    return jsonify(item)
