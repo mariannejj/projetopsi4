@@ -1,20 +1,39 @@
-from flask import Flask
+from pathlib import Path
+from flask import Flask, send_from_directory
 from flask_cors import CORS
+
 from db import init_db
 import items
 
-app = Flask(__name__, instance_relative_config=True)
-app.config["database"] = "plataforma_estudos.db"
 
-CORS(app)
+def create_app() -> Flask:
+    app = Flask(__name__, instance_relative_config=True)
+    app.config["database"] = "plataforma_estudos.db"
 
-with app.app_context():
-    init_db()
+    CORS(app)
 
-app.route("/items", methods=["GET"])(items.listar)
-app.route("/items", methods=["POST"])(items.criar)
-app.route("/items/<int:id>", methods=["PUT"])(items.editar)
-app.route("/items/<int:id>/status", methods=["PATCH"])(items.mudar_status)
-app.route("/items/<int:id>", methods=["DELETE"])(items.remover)
+    with app.app_context():
+        init_db()
 
-app.run(debug=True)
+    web_dir = Path(__file__).resolve().parent.parent / "web"
+
+    @app.get("/")
+    def home():
+        return send_from_directory(web_dir, "index.html")
+
+    @app.get("/<path:filename>")
+    def web_files(filename):
+        return send_from_directory(web_dir, filename)
+
+    app.route("/items", methods=["GET"])(items.listar)
+    app.route("/items", methods=["POST"])(items.criar)
+    app.route("/items/<int:id>", methods=["PUT"])(items.editar)
+    app.route("/items/<int:id>/status", methods=["PATCH"])(items.mudar_status)
+    app.route("/items/<int:id>", methods=["DELETE"])(items.remover)
+
+    return app
+
+
+if __name__ == "__main__":
+    app = create_app()
+    app.run(debug=True)

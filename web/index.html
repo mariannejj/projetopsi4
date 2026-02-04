@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Treinos</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Cadastro de Treinos</h1>
+
+<form id="form">
+
+<input id="titulo" placeholder="Título">
+
+<select id="tipo">
+<option>caminhada</option>
+<option>rua</option>
+<option>meia-maratona</option>
+<option>maratona</option>
+</select>
+
+<select id="status">
+<option>ativo</option>
+<option>concluido</option>
+<option>cancelado</option>
+</select>
+
+<button type="submit">Salvar</button>
+
+</form>
+
+<hr>
+
+<button onclick="carregar()">Atualizar Lista</button>
+
+<table border="1">
+<thead>
+<tr>
+<th>ID</th>
+<th>Título</th>
+<th>Tipo</th>
+<th>Status</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody id="lista"></tbody>
+
+</table>
+
+<script src="script.js"></script>
+
+</body>
+</html>
