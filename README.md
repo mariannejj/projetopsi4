@@ -1,45 +1,167 @@
 Agenda de Treinos
 
-A Agenda de Treinos é um  mini-sistema de registros para organização de treinos de atletas que permite cadastrar, editar, listar e gerenciar atividades físicas como corrida, caminhada e treino funcional, facilitando o controle da rotina esportiva.
-O projeto foi desenvolvido no modelo API + Frontend, com uma única entidade principal, conforme o contrato do projeto proposto para o Ensino Médio Técnico.
+Integrantes:
+Marianne Júlia Ferreira dos Santos
+Lívia Vitória Guadalupe de Souza Faria
+Evelyn Ester Azevedo Brito
+Kessya Cauanny de Araújo Costa
+Ludimila Erika Silva de Araújo
 
-Categoria: Saúde
-Tema: Agenda de Treinos (Atletas)
 
-Entidade única: Item
-Campos obrigatórios: id (number), titulo (string, mínimo 3 caracteres),tipo (string) e status (string).
-Campos opcionais utilizados: descrição (string) e data (string no formato YYYY-MM-DD).
+Descrição:
 
-Tipos: corrida ,caminhada, maratona e meio maratona.
-Status: ativo, concluído e cancelado
+Este projeto consiste no desenvolvimento de uma aplicação web para gerenciamento de itens relacionados a treinos e atividades físicas. A aplicação permite cadastrar, listar, editar, excluir e alterar o status dos itens, além de possibilitar filtragens.
 
-API — Endpoints
-Base URL: http://localhost:5000
+O sistema foi desenvolvido utilizando Python com Flask no backend, banco de dados SQLite e frontend em HTML, CSS e JavaScript puro.
+
+
+Objetivo:
+
+Permitir o controle e organização de atividades físicas, registrando treinos e provas esportivas, mantendo informações organizadas e persistentes.
+
+Modelo de Dados
+Entidade: Item
+Campo	Tipo	Obrigatório	Descrição
+id	inteiro	Sim	Identificador único
+titulo	texto	Sim	Nome do treino
+tipo	texto	Sim	Categoria do treino
+status	texto	Sim	Situação do treino
+data	texto	Opcional	Data do treino (YYYY-MM-DD)
+valor	número	Opcional	Valor associado ao treino
+
+Tipos Permitidos:
+caminhada
+rua
+meia-maratona
+maratona
+
+Status Permitidos:
+ativo
+concluido
+cancelado
+
+Funcionalidades:
+Backend
+Listar itens
+Criar item
+Editar item
+Excluir item
+Alterar status
+Validação de dados
+Persistência em banco SQLite
+Tratamento de erros
+API REST
+Frontend
+Tela única
+Cadastro e edição de itens
+Listagem em tabela
+Exclusão de itens
+Alteração de status
+Filtros por tipo e status
+Mensagens de erro e sucesso
+Indicador de carregamento
+
+Endpoints da API:
+Listar itens
 GET /items
-GET /items?tipo=corrida
-GET /items?status=planejado
+
+
+Filtros opcionais:
+GET /items?tipo=caminhada
+GET /items?status=ativo
+
+Criar item
 POST /items
+
+
+Exemplo JSON:
+
+{
+  "titulo": "Treino longo",
+  "tipo": "rua",
+  "status": "ativo",
+  "data": "2026-02-04",
+  "valor": 50
+}
+
+Editar item
 PUT /items/:id
+
+Alterar status
 PATCH /items/:id/status
+
+Excluir item
 DELETE /items/:id
 
-Título é obrigatório e deve ter no mínimo 3 caracteres,tipo deve estar dentro da lista permitida; Status deve estar dentro da lista permitida; Data, quando informada, deve estar no formato YYYY-MM-DD.
-Exemplo de erro:
-  "error": "título é obrigatório e deve ter no mínimo 3 caracteres"
+Validações Implementadas
+Título mínimo de 3 caracteres
+Tipo deve estar na lista permitida
+Status deve estar na lista permitida
+Valor deve ser maior ou igual a zero
+Data deve estar no formato YYYY-MM-DD
+Persistência
+Os dados são armazenados em banco SQLite localizado em:
+instance/agenda.db
 
-Os dados são armazenados em um arquivo items.json, garantindo que as informações não sejam perdidas ao reiniciar o servidor.
-Frontend
-O sistema possui uma única tela com formulário para criar e editar treinos, lista de treinos cadastrados, ações de editar, remover e mudar status, filtros por tipo e status.
-O frontend consome a API utilizando fetch ou axios.
-Como Executar
-Backend: Instalar Python 3, criar e ativar ambiente virtual, Instalar dependências do requirements.txt, executar o arquivo principal da aplicação
-Frontend: Instalar dependências com npm e executar o projeto com npm run dev
+Como Executar o Projeto
+Clonar o repositório
+git clone <https://github.com/mariannejj/projetopsi4>
+Criar ambiente virtual
+python -m venv venv
+Ativar ambiente virtual
 
-Autores
-Evelyn Ester Azevedo Brito
-Kessya Cauanny Araújo Costa
-Lívia Vitória Guadalupe Souza Faria
-Ludimila Érica Silva de Araújo
-Marianne Júlia Ferreira dos Santos
+Windows:
+venv\Scripts\activate
+
+Linux/Mac:
+source venv/bin/activate
+
+Instalar dependências
+pip install flask flask-cors ou pip install -r requeriments.txt
+
+Executar o servidor
+python app.py
+
+Acessar no navegador
+http://localhost:5000
+
+Tecnologias Utilizadas:
+Python
+Flask
+SQLite
+HTML5
+CSS3
+JavaScript
+Fetch API
 
 
+Estrutura do Projeto
+PROJETOPSI4/
+│
+├── backend/
+│   ├── instance/
+│   │   └── agenda.db
+│   │
+│   ├── app.py
+│   ├── db.py
+│   ├── items.py
+│   └── settings.py
+│
+├── web/
+│   ├── index.html
+│   ├── script.js
+│   └── style.css
+│
+├── README.md
+├── requirements.txt
+
+
+Testes Realizados:
+Foram realizados testes utilizando navegador web e requisições utilizando Fetch API.
+Autenticação de usuários
+Interface responsiva
+
+
+
+Licença:
+Projeto desenvolvido para fins acadêmicos.
