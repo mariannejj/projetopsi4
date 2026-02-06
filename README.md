@@ -103,7 +103,7 @@ Persistência
 Os dados são armazenados em banco SQLite localizado em:
 instance/agenda.db
 
-Como Executar o Projeto
+Como Executar o Projeto:
 Clonar o repositório
 git clone <https://github.com/mariannejj/projetopsi4>
 Criar ambiente virtual
@@ -119,8 +119,7 @@ source venv/bin/activate
 Instalar dependências
 pip install flask flask-cors ou pip install -r requeriments.txt
 
-Executar o servidor
-python app.py
+cd backend e flask run --debug
 
 Acessar no navegador
 http://localhost:5000

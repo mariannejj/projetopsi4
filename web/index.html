@@ -9,6 +9,8 @@
 <body>
 
 <h1>Cadastro de Treinos</h1>
+<p id="msg"></p>
+
 
 <form id="form">
 
@@ -34,6 +36,27 @@
 <hr>
 
 <button onclick="carregar()">Atualizar Lista</button>
+
+<div class="filtros">
+    <select id="filtroTipo">
+        <option value="">todos os tipos</option>
+        <option value="caminhada">caminhada</option>
+        <option value="rua">rua</option>
+        <option value="meia-maratona">meia-maratona</option>
+        <option value="maratona">maratona</option>
+    </select>
+
+    <select id="filtroStatus">
+        <option value="">todos os status</option>
+        <option value="ativo">ativo</option>
+        <option value="concluido">concluido</option>
+        <option value="cancelado">cancelado</option>
+    </select>
+
+    <button type="button" onclick="aplicarFiltros()">Filtrar</button>
+    <button type="button" onclick="limparFiltros()">Limpar</button>
+    </div>  
+
 
 <table border="1">
 <thead>

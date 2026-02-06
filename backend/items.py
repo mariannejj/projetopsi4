@@ -88,7 +88,7 @@ def criar():
     ))
     conn.commit()
 
-    novo_id = cur.lastrowid  # pega o id do item criado
+    novo_id = cur.lastrowid  # pega o id do item crisdo
     conn.close()
 
     item = buscar_item_por_id(novo_id)
@@ -96,7 +96,7 @@ def criar():
 
 
 def editar(id):
-    # 404 se não existir
+    #404 se n existir
     if not buscar_item_por_id(id):
         return jsonify({"error": "item nao encontrado"}), 404
 
@@ -127,7 +127,7 @@ def editar(id):
 
 
 def mudar_status(id):
-    # 404 se não existir
+    #404 se n existir
     if not buscar_item_por_id(id):
         return jsonify({"error": "item nao encontrado"}), 404
 

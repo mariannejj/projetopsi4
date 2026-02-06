@@ -4,13 +4,9 @@ from flask_cors import CORS
 from db import init_db
 import items
 
-app = Flask(__name__)
-CORS(app)
-
-
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
-    app.config["database"] = "plataforma_estudos.db"
+    app.config["database"] = "agenda.db"
 
     CORS(app)
 
@@ -35,7 +31,7 @@ def create_app() -> Flask:
 
     return app
 
+app = create_app()
 
 if __name__ == "__main__":
-    app = create_app()
     app.run(debug=True)
